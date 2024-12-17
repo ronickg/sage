@@ -38,6 +38,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
+import { useErrors } from '@/hooks/useErrors';
 import {
   BadgeCheckIcon,
   BadgeIcon,
@@ -150,6 +151,8 @@ const MobileRow = ({
 };
 
 export default function PeerList() {
+  const { addError } = useErrors();
+
   const [peers, setPeers] = useState<PeerRecord[] | null>(null);
   const [rowSelection, setRowSelection] = useState({});
   const [isAddOpen, setAddOpen] = useState(false);
@@ -238,48 +241,23 @@ export default function PeerList() {
     onRowSelectionChange: setRowSelection,
   });
 
-  const handleBatchDelete = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    const peersToDelete = selectedRows.map((row) => row.original);
-    if (peersToDelete.length > 0) {
-      setPeerToDelete(peersToDelete);
-    }
-  };
-
-  const handleSelect = (peer: PeerRecord, forceModeOn = false) => {
-    if (forceModeOn && !selectionMode) {
-      setSelectionMode(true);
-      setSelectedPeers(new Set([peer.ip_addr]));
-      return;
-    }
-
-    setSelectedPeers((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(peer.ip_addr)) {
-        newSet.delete(peer.ip_addr);
-        if (newSet.size === 0) {
-          setSelectionMode(false);
-        }
-      } else {
-        newSet.add(peer.ip_addr);
-      }
-      return newSet;
-    });
-  };
-
-  const updatePeers = () => {
-    commands.getPeers({}).then((res) => {
-      if (res.status === 'ok') {
-        setPeers(res.data.peers);
-      }
-    });
-  };
+  const updatePeers = useCallback(
+    () =>
+      commands
+        .getPeers({})
+        .then((data) => setPeers(data.peers))
+        .catch(addError),
+    [addError],
+  );
 
   useEffect(() => {
     updatePeers();
     const interval = setInterval(updatePeers, 1000);
-    return () => clearInterval(interval);
-  }, []);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [updatePeers]);
 
   return (
     <Layout>
@@ -383,10 +361,17 @@ export default function PeerList() {
                   </DialogContent>
                   {!isMobile && (
                     <Button
-                      className='ml-2'
-                      variant='outline'
-                      onClick={handleBatchDelete}
-                      disabled={Object.keys(rowSelection).length === 0}
+                      onClick={() => {
+                        commands
+                          .addPeer({ ip, trusted })
+                          .then(() => updatePeers())
+                          .catch(addError)
+                          .finally(() => {
+                            setIp('');
+                            setAddOpen(false);
+                          });
+                      }}
+                      autoFocus
                     >
                       <Trash2Icon className='h-5 w-5' />
                     </Button>
@@ -502,17 +487,15 @@ export default function PeerList() {
               </Button>
               <Button
                 onClick={() => {
-                  if (peerToDelete) {
-                    setSelectionMode(false);
-                    Promise.all(
-                      peerToDelete.map((peer) =>
-                        commands.removePeer({ ip: peer.ip_addr, ban }),
-                      ),
-                    ).then(() => {
-                      setPeerToDelete(null);
-                      updatePeers();
-                    });
-                  }
+                  peerToDelete &&
+                    commands
+                      .removePeer({ ip: peerToDelete.ip_addr, ban })
+                      .then(() => {
+                        setPeerToDelete(null);
+                        updatePeers();
+                      })
+                      .catch(addError)
+                      .finally(() => setPeerToDelete(null));
                 }}
                 autoFocus
               >
