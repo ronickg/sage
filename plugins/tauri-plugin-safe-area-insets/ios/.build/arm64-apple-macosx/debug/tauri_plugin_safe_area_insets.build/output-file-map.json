@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/.build/arm64-apple-macosx/debug/tauri_plugin_safe_area_insets.build/master.swiftdeps"
+  },
+  "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/Sources/InsetPlugin.swift": {
+    "dependencies": "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/.build/arm64-apple-macosx/debug/tauri_plugin_safe_area_insets.build/InsetPlugin.d",
+    "object": "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/.build/arm64-apple-macosx/debug/tauri_plugin_safe_area_insets.build/InsetPlugin.swift.o",
+    "swiftmodule": "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/.build/arm64-apple-macosx/debug/tauri_plugin_safe_area_insets.build/InsetPlugin~partial.swiftmodule",
+    "swift-dependencies": "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/.build/arm64-apple-macosx/debug/tauri_plugin_safe_area_insets.build/InsetPlugin.swiftdeps"
+  }
+}

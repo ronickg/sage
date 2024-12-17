@@ -1,0 +1,4 @@
+module Tauri {
+    header "/Users/ronaldgoedeke/Desktop/Coding/rust/tauri-plugin-safe-area-insets/ios/.build/arm64-apple-macosx/debug/Tauri.build/Tauri-Swift.h"
+    requires objc
+}
